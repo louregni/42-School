@@ -1,8 +1,12 @@
 # Here is some code realized during my curriculum in 42
 
-###	Firstly, this is my progression, the holygraph represent the suite of projects in 42. ![ Holygraph ](https://github.com/louregni/42-School/blob/master/resources/holygraph.png )
+### Firstly, this is my progression, the holygraph represent the suite of projects in 42.
 
-### Marks associated with projects:[ Marks ](https://github.com/louregni/42-School/blob/master/resources/school-record.png)
+![](https://raw.githubusercontent.com/louregni/42-School/master/resources/holygraph.png)
+
+### Marks associated with projects:
+
+![](https://raw.githubusercontent.com/louregni/42-School/master/resources/school-record.png)
 
 #### Don't forget: all this code was produced in my curriculum, so I had to follow the norm of the school : [en](https://github.com/louregni/42-School/blob/master/resources/norme.en.pdf) | [fr](https://github.com/louregni/42-School/blob/master/resources/norme.fr.pdf)
 
