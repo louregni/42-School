@@ -1,0 +1,12 @@
+#!/bin/sh
+#@./scripts/norm
+if [[ -f "./auteur" ]]
+then 
+	RSLT=`cat ./auteur`
+	if [[ "$RSLT" != "louregni
+vlaroque" ]]
+	then 
+		printf "\e[31mWrong name in author file !\n"
+	fi 
+		printf "\e[32mAuthor file : ok\n"
+fi

@@ -1,0 +1,7 @@
+#!/bin/sh
+norm="$(printf '\033[0m')"
+bold="$(printf '\033[0;1m')"
+red="$(printf '\033[0;31m')"
+orange="$(printf '\e[38;5;166m')"
+green="$(printf '\033[0;32m')"
+norminette $* | sed -e "s/Warning/${orange}Warning${norm}/g;s/Error/${red}Error${norm}/g;s/Norme/${green}Norme${norm}/g"

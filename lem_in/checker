@@ -1,0 +1,90 @@
+#!/bin/bash
+
+MAP=('big' 'big-superposition' 'flow-one' 'flow-ten' 'flow-thousand')
+PWD=$(dirname "$0")
+FOLDER="$PWD/unit_test"
+ERROR="$FOLDER/error"
+
+init_folder()
+{
+	for name in "${MAP[@]}";
+	do
+		mkdir -p "$FOLDER/$name"
+		mkdir -p "$ERROR/$name"
+	done
+}
+
+retry_error()
+{
+	for name in "${MAP[@]}";
+	do
+		ERROR_FILES=`find $ERROR/$name -type l`
+		for file in $ERROR_FILES
+		do
+			printf "$name\n"
+			REAL=`readlink "$file"`
+			GEN=`awk '/#Here is the number of lines required: [[:digit:]]/{print$8}' "$REAL" | tail -n +2`
+			$PWD/lem-in --line < $REAL &> $REAL.result && US=`awk '/Number of lines : [[:digit:]]/{print$5}' $REAL.result`
+			if [ $US -gt $GEN ]
+			then
+				printf "\e[31m[$US vs $GEN]"
+			else
+				printf "\e[32m[$US vs $GEN]"
+			fi
+			sleep 1
+		done
+		printf "\n"
+	done
+}
+
+printf "\e[32m================================================================================\n"
+printf "\e[32m|                                \e[38;5;202mLEM_IN CHECKER                                \e[32m|\n"
+printf "|                                              \e[38;5;190mauthor: \e[36mlouregni                \e[32m|\n"
+printf "|==============================================================================|\n"
+
+if [ $# -gt 0 ]
+then
+	if [ $1 == "retry" ]
+	then
+		retry_error
+		exit 0
+	fi
+	AVG=$1
+else
+	AVG=5
+fi
+	printf "\e[32m|                               AVERAGE VALUE = {%.6s"$AVG"}                            |\n"
+
+rm -rf $FOLDER &> /dev/null
+init_folder
+
+printf "\e[32m|                             Upgrading the project ...                        |\n"
+if [[ ! -f "$PWD/lem-in" ]]
+then
+	make -C $PWD
+fi
+
+
+printf "\e[32m================================================================================\n"
+printf "\e[32m|                             Starting Unit Tests                              |\n"
+printf "\e[32m|                             Lem_in vs generator                              |\n"
+printf "\e[32m|==============================================================================|\n"
+for name in "${MAP[@]}";
+do
+	printf "\n\e[38;5;57m>>>> \e[38;5;33m$name\n"
+	for (( i=0; i<=AVG; i++ ))
+	do
+		$PWD/scripts/generator --$name > $FOLDER/$name/$i
+		GEN=`awk '/#Here is the number of lines required: [[:digit:]]/{print$8}' $FOLDER/$name/$i | tail -n +2`
+		$PWD/lem-in --line < $FOLDER/$name/$i &> $FOLDER/$name/$i.result && US=`awk '/Number of lines : [[:digit:]]/{print$5}' $FOLDER/$name/$i.result`
+		if [ $US -gt $GEN ]
+		then
+			printf "\e[38;5;93m{\e[38;5;33m[\e[38;5;14m$i\e[38;5;33m]\e[38m>"; printf '\e[31m%3s' "$US"; printf " \e[38;5;226m~\e[31m%3s" "$GEN"; printf "\e[38;5;196m ✗\e[38;5;93m} "
+			ln -s "$FOLDER/$name/$i" "$ERROR/$name/$i"
+		else
+			printf "\e[38;5;93m{\e[38;5;33m[\e[38;5;14m$i\e[38;5;33m]\e[38m>"; printf '\e[32m%3s' "$US"; printf " \e[38;5;226m~\e[32m%3s" "$GEN" && if [ $GEN -gt $US ] ; then $PWD/.checker/imgcat $PWD/.checker/parrot.gif ; else printf "\e[38;5;46m ✓" ; fi && printf "\e[38;5;93m} "
+		fi
+		sleep 2
+	done
+	printf "\n"
+done
